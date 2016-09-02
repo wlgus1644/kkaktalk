@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="net.nigne.kkt.mappers.tradeMapper">
+
+	<select id="getNo" resultType="int">
+		select no from trade order by no desc limit 1;
+	</select>
+
+	<insert id="insertProduct">
+		insert into trade(title, category, price, content, member_email, date)
+		values(#{title}, #{category}, #{price}, #{content}, #{member_email}, sysdate());
+	</insert>
+
+	<select id="getSearchList" parameterType="hashmap" resultType="net.nigne.kkt.domain.TradeVO">
+		select *
+		from trade
+		<where>
+			<choose>
+				<when test="keyfield == '전체'">
+					title like concat("%",#{keyword},"%") order by no desc
+				</when>
+				<when test="keyfield == '가전제품'">
+					category='가전제품' and title like concat("%",#{keyword},"%") order by no desc
+				</when>
+				<when test="keyfield == '의류'">
+					category='의류' and title like concat("%",#{keyword},"%") order by no desc
+				</when>
+				<when test="keyfield == '기타'">
+					category='기타' and title like concat("%",#{keyword},"%") order by no desc
+				</when>
+			</choose>
+		</where>
+	</select>
+
+
+	<update id="updateProduct">
+		update trade
+		<!--<trim prefix="SET" suffixOverrides=","> </trim> -->
+		<set>
+			<if test="title != null">
+				title=#{title},
+			</if>
+			<if test="category != null">
+				category=#{category},
+			</if>
+			<if test="price !=null">
+				price=#{price},
+			</if>
+			<if test="content !=null">
+				content=#{content}
+			</if>
+		</set>
+		where no=#{no}
+	</update>
+
+
+	<delete id="deleteProduct">
+		delete from trade where no= #{no}
+	</delete>
+
+	<select id="get" resultType="net.nigne.kkt.domain.TradeVO">
+		select * from trade where no= #{no}
+	</select>
+
+	<select id="getList" resultType="net.nigne.kkt.domain.TradeVO">
+		select * from trade order by no desc
+	</select>
+   
+	<select id="thumbnail" resultType="String">
+		select m.thumbnail from member m inner join trade t
+		on m.email = t.member_email where t.no=#{no}
+	</select>
+</mapper>
+
+
+   
+   
+      
+   

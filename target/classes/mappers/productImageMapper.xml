@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ 
+ <mapper namespace ="net.nigne.kkt.mappers.productImageMapper">
+
+	<insert id="uploadFile" parameterType="HashMap">
+		insert into
+		product_image (trade_no, image)
+		values (#{no}, #{saveFileName})
+	</insert>
+
+	<insert id="update_uploadFile" parameterType="HashMap">
+		insert into
+		product_image (trade_no,image)
+		values (#{trade_no}, #{saveFileName})
+	</insert>
+
+	<select id="get" resultType="net.nigne.kkt.domain.ProductImageVO">
+		select * 
+		from product_image 
+		where trade_no = #{no}
+	</select>
+
+	<select id="getList" resultType="net.nigne.kkt.domain.ProductImageVO">
+		select * 
+		from product_image
+	</select>
+
+	<update id="update">
+		update product_image
+		<set>
+			<if test="content != null">
+				trade_no = #{trade_no},
+			</if>
+			<if test="content != null">
+				image = #{image},
+			</if>
+		</set>
+		where image_no = #{no}
+	</update>
+
+
+	<delete id="delete">
+		delete 
+		from product_image 
+		where trade_no = #{no}
+	</delete>
+
+	<delete id="delete_image">
+		delete 
+		from product_image 
+		where image_no = #{image_no}
+	</delete>
+ 
+ </mapper>

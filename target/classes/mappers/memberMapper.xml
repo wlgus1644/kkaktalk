@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="net.nigne.kkt.mappers.memberMapper">
+
+	<select id="memberList" resultType="net.nigne.kkt.domain.MemberVO">
+		select *
+		from member
+	</select>
+
+	<select id="memberInfo" resultType="net.nigne.kkt.domain.MemberVO">
+		select * from member where
+		email = #{email}
+	</select>
+
+	<select id="Search" resultType="net.nigne.kkt.domain.MemberVO">
+		select * from member where email = #{email} and use_state = 1
+	</select>
+
+	<select id="oneInfo" resultType="net.nigne.kkt.domain.MemberVO">
+		select * from member where email = #{email} and use_state = 1
+	</select>
+
+	<insert id="memberInsert">
+		insert into member (email, pw, phone_num, name, thumbnail, use_state, nickname)
+		values (#{email}, #{pw}, #{phone_num}, #{name}, #{thumbnail}, 0, #{nickname})
+	</insert>
+	
+	<update id="memberJoin">
+		update member set use_state=1 where email=#{email}
+	</update>
+	
+	<select id="joinCheck" resultType="int">
+		select use_state from member where email=#{email}
+	</select>
+
+	<select id="memberLogin" resultType="String">
+		select pw from member where email = #{email} and use_state = 1
+		<!-- select CryptIT.decrypt(pw,#{email}) pw from member where email=#{email} -->
+	</select>
+
+	<select id="friendList" resultType="net.nigne.kkt.domain.MemberVO">
+		select * from member m 
+		inner join friends f on m.email = f.friend_email
+		where f.member_email =
+		#{email} and m.use_state = 1 order by name
+	</select>
+
+	<select id="friendListSearch" resultType="net.nigne.kkt.domain.MemberVO">
+		select * from member m
+		inner join friends f on m.email = f.friend_email
+		where f.member_email = #{email} and m.use_state = 1 and m.name like '%'||#{search}||'%'
+	</select>
+
+	<select id="friendSearch" resultType="net.nigne.kkt.domain.MemberVO">
+		select *
+		from member m inner
+		join friends f
+		on m.email = f.member_email
+		where f.friend_email = #{email}
+		and m.use_state = 1
+		and email not in (
+		select a.friend_email
+		from friends a inner join friends b on a.friend_email = b.member_email
+		where a.member_email = b.friend_email and a.member_email = #{email})
+	</select>
+
+	<insert id="friendAdd">
+		insert into friends (friend_email, member_email)
+		values (#{friend_email}, #{member_email})
+	</insert>
+
+	<select id="alreadyFriend" resultType="net.nigne.kkt.domain.FriendsVO">
+		select * from friends
+		where member_email = #{member_email} and friend_email = #{friend_email}
+	</select>
+
+	<update id="memberUpdate">
+		update member
+		<set>
+			<if test="phone_num != null">
+				phone_num = #{phone_num},
+			</if>
+			<if test="thumbnail !=null">
+				thumbnail = #{thumbnail},
+			</if>
+			<if test="nickname != null">
+				nickname = #{nickname},
+			</if>
+			<if test="bank_type != null">
+				bank_type = #{bank_type},
+	       </if>
+	       <if test="account_num != ''">
+				account_num = #{account_num}
+	       </if>
+		</set>
+		where email = #{email}
+	</update>
+	
+	<update id="pwUpdate">
+		update member set pw = #{pw} where email = #{email}
+	</update>
+
+	<delete id="friendDelete">
+		delete from friends 
+		where member_email = #{member_email} and friend_email = #{friend_email}
+	</delete>
+
+	<update id="memberDelete">
+		update member 
+		set use_state = 0 
+		where email = #{email}
+	</update>
+
+	<select id="idSearch" resultType="String">
+		select email 
+		from member 
+		where name = #{name} and phone_num = #{phone_num}
+	</select>
+
+	<select id="pwSearch" resultType="String">
+		select pw 
+		from member 
+		where email = #{email} and name = #{name} and phone_num = #{phone_num}
+	</select>
+	
+	<update id="updateAccount">
+      update member 
+      set account_num = #{account_num}, bank_type = #{bank_type} 
+      where email = #{email}
+    </update>
+   
+   <select id="checkAccount" resultType="int">
+      select count(*) 
+      from member 
+      where email =#{email} and account_num is not null
+   </select>
+   
+   
+
+</mapper>
